@@ -1,1 +1,1 @@
-web: bin/kelvinblog
+web: go run cmd/server/main.go
