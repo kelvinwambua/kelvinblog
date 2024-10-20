@@ -1,6 +1,6 @@
-   build:
-     languages:
-       - go
-   
-   run:
-     web: kelvinblog
+build:
+  languages:
+    - go
+
+run:
+  web: go run cmd/server/main.go
