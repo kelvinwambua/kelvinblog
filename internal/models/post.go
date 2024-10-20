@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"log"
 	"time"
 )
 
@@ -41,11 +42,13 @@ func GetPostByID(db *sql.DB, id int) (Post, error) {
 	return p, nil
 }
 
-func CreatePost(db *sql.DB, title, content string) (Post, error) {
-	var p Post
-	err := db.QueryRow("INSERT INTO posts (title, content) VALUES ($1, $2) RETURNING id, title, content, created_at", title, content).Scan(&p.ID, &p.Title, &p.Content, &p.CreatedAt)
+func CreatePost(db *sql.DB, title, content string) (int, error) {
+	var id int
+	err := db.QueryRow("INSERT INTO posts (title, content) VALUES ($1, $2) RETURNING id", title, content).Scan(&id)
 	if err != nil {
-		return Post{}, err
+		log.Printf("Error inserting post into database: %v", err) // Add this line
+		return 0, err
 	}
-	return p, nil
+	log.Printf("Post created with ID: %d", id) // Add this line
+	return id, nil
 }

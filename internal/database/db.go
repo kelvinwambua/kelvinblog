@@ -3,13 +3,18 @@ package database
 import (
 	"database/sql"
 	"log"
+	"os"
 
 	_ "github.com/lib/pq"
 )
 
 func InitDB() (*sql.DB, error) {
-	connectionString := "postgresql://neondb_owner:UJ5swpdQR9Hz@ep-proud-breeze-a50z2015.us-east-2.aws.neon.tech/neondb?sslmode=require"
+	connectionString := os.Getenv("DATABASE_URL")
+	if connectionString == "" {
+		connectionString = "postgresql://neondb_owner:UJ5swpdQR9Hz@ep-proud-breeze-a50z2015.us-east-2.aws.neon.tech/neondb?sslmode=require"
+	}
 	db, err := sql.Open("postgres", connectionString)
+
 	if err != nil {
 		return nil, err
 	}

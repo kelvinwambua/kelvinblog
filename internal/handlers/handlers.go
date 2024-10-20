@@ -22,7 +22,21 @@ func IndexHandler(db *sql.DB) http.HandlerFunc {
 		}
 
 		log.Println("Parsing templates...")
-		tmpl := template.New("layout")
+
+		// Define the function map
+		funcMap := template.FuncMap{
+			"truncate": func(s string, max int) string {
+				if len(s) <= max {
+					return s
+				}
+				return s[:max] + "..."
+			},
+		}
+
+		// Create a new template with the function map
+		tmpl := template.New("layout").Funcs(funcMap)
+
+		// Parse the template files
 		tmpl, err = tmpl.ParseFiles("templates/layout.html", "templates/index.html")
 		if err != nil {
 			log.Printf("Error parsing templates: %v", err)
@@ -69,26 +83,41 @@ func PostHandler(db *sql.DB) http.HandlerFunc {
 	}
 }
 
+func CreatePostPageHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		tmpl, err := template.ParseFiles("templates/create.html")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		err = tmpl.Execute(w, nil)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	}
+}
 func CreatePostHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, "Failed to parse form", http.StatusBadRequest)
+			return
+		}
+
 		title := r.FormValue("title")
 		content := r.FormValue("content")
 
-		post, err := models.CreatePost(db, title, content)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		if title == "" || content == "" {
+			http.Error(w, "Title and content are required", http.StatusBadRequest)
 			return
 		}
 
-		tmpl, err := template.ParseFiles("templates/layout.html", "templates/post.html")
+		_, err := models.CreatePost(db, title, content)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, "Failed to create post: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		err = tmpl.ExecuteTemplate(w, "layout", post)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
+		// Redirect to the home page after successful post creation
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 	"github.com/kelvinwambua/kelvinblog/internal/database"
@@ -22,8 +23,13 @@ func main() {
 
 	r.HandleFunc("/", handlers.IndexHandler(db)).Methods("GET")
 	r.HandleFunc("/post/{id}", handlers.PostHandler(db)).Methods("GET")
+	r.HandleFunc("/create", handlers.CreatePostPageHandler()).Methods("GET")
 	r.HandleFunc("/create", handlers.CreatePostHandler(db)).Methods("POST")
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "5000" // Default port if not specified
+	}
 
-	log.Println("Server starting on :5000")
-	log.Fatal(http.ListenAndServe(":5000", r))
+	log.Printf("Server starting on :%s", port)
+	log.Fatal(http.ListenAndServe(":"+port, r))
 }
