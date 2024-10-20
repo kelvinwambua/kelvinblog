@@ -1,6 +1,7 @@
+
 {{define "content"}}
-    <section class="posts-list">
-        <h2>Latest Posts</h2>
+<section class="posts-list">
+    <div class="posts-grid">
         {{range .}}
             <article class="post-card">
                 <h3><a href="/post/{{.ID}}">{{.Title}}</a></h3>
@@ -8,7 +9,12 @@
                 <p class="post-excerpt">{{truncate .Content 150}}</p>
             </article>
         {{else}}
-            <p>No posts yet. Be the first to create one!</p>
+            <div class="post-card">
+                <h3>Welcome to the Blog!</h3>
+                <p>No posts yet. Be the first to create one!</p>
+            </div>
         {{end}}
-    </section>
+    </div>
+</section>
 {{end}}
+

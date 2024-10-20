@@ -1,8 +1,9 @@
+
 {{define "content"}}
-    <article class="full-post">
-        <h2>{{.Title}}</h2>
-        <p class="post-meta">{{.CreatedAt.Format "Jan 02, 2006"}}</p>
-        <div class="post-content">{{.Content}}</div>
-    </article>
-    <a href="/" class="btn btn-back">Back to Home</a>
+<article class="full-post">
+    <h2>{{.Title}}</h2>
+    <p class="post-meta">{{.CreatedAt.Format "Jan 02, 2006"}}</p>
+    <div class="post-content">{{.Content}}</div>
+    <a href="/" class="btn btn-back">← Back to Home</a>
+</article>
 {{end}}

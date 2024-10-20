@@ -3,28 +3,382 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kelvin's Blog</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
-    <script src="/static/js/htmx.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
+    <title>Kelvin's Tech Blog | Built with Go & HTMX</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --background: #ffffff;
+            --foreground: #0f172a;
+            --card: #f8fafc;
+            --card-hover: #f1f5f9;
+            --border: #e2e8f0;
+            --muted: #64748b;
+            --accent: #8b5cf6;
+            --header-height: 60px;
+            --safe-area-inset-bottom: env(safe-area-inset-bottom);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --background: #0f172a;
+                --foreground: #f8fafc;
+                --card: #1e293b;
+                --card-hover: #334155;
+                --border: #475569;
+                --muted: #94a3b8;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--background);
+            color: var(--foreground);
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-bottom: var(--safe-area-inset-bottom);
+        }
+
+        @supports (-webkit-touch-callout: none) {
+            body {
+                min-height: -webkit-fill-available;
+            }
+        }
+
+        main {
+            flex: 1 1 auto;
+            min-height: 0;
+            padding-bottom: 2rem;
+        }
+
+        .container {
+            width: 100%;
+            padding: 0 1rem;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 640px) {
+            .container {
+                padding: 0 2rem;
+            }
+        }
+
+        @media (min-width: 1100px) {
+            .container {
+                max-width: 1100px;
+            }
+        }
+
+        header {
+            background: var(--background);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            height: var(--header-height);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .header-content {
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        nav {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        nav a {
+            color: var(--foreground);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+        }
+
+        nav a:hover {
+            background: var(--card);
+        }
+
+        .tech-stack {
+            display: none;
+        }
+
+        @media (min-width: 640px) {
+            .tech-stack {
+                display: flex;
+                gap: 0.5rem;
+                margin-left: 1rem;
+            }
+            
+            nav a {
+                font-size: 1rem;
+            }
+        }
+
+        .tech-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background: var(--card);
+            color: var(--muted);
+            border: 1px solid var(--border);
+        }
+
+        .posts-list {
+            padding: 1rem 0;
+        }
+
+        @media (min-width: 640px) {
+            .posts-list {
+                padding: 2rem 0;
+            }
+        }
+
+        .posts-grid {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: 1fr;
+            margin-top: 1rem;
+        }
+
+        @media (min-width: 640px) {
+            .posts-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .posts-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 2rem;
+            }
+        }
+
+        .post-card {
+            background: var(--card);
+            border-radius: 1rem;
+            padding: 1.25rem;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        @media (hover: hover) {
+            .post-card:hover {
+                transform: translateY(-4px);
+                background: var(--card-hover);
+                box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
+            }
+        }
+
+        .post-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .post-card h3 a {
+            color: var(--foreground);
+            text-decoration: none;
+        }
+
+        .post-meta {
+            color: var(--muted);
+            font-size: 0.875rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .post-excerpt {
+            color: var(--muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .create-form {
+            background: var(--card);
+            border-radius: 1rem;
+            padding: 1.25rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+        }
+
+        @media (min-width: 640px) {
+            .create-form {
+                padding: 2rem;
+                margin: 2rem auto;
+                max-width: 800px;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--foreground);
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            background: var(--background);
+            color: var(--foreground);
+            border-radius: 0.5rem;
+            font-size: 16px;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            height: 200px;
+            resize: vertical;
+        }
+
+        .btn {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            font-size: 1rem;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        @media (min-width: 640px) {
+            .btn {
+                width: auto;
+                padding: 0.75rem 1.5rem;
+            }
+        }
+
+        .full-post {
+            padding: 1.25rem;
+            margin: 1rem 0;
+            background: var(--card);
+            border-radius: 1rem;
+            border: 1px solid var(--border);
+        }
+
+        @media (min-width: 640px) {
+            .full-post {
+                padding: 2rem;
+                margin: 2rem auto;
+                max-width: 800px;
+            }
+        }
+
+        .full-post h2 {
+            font-size: 1.75rem;
+            line-height: 1.3;
+        }
+
+        @media (min-width: 640px) {
+            .full-post h2 {
+                font-size: 2.25rem;
+            }
+        }
+
+        .post-content {
+            margin-top: 1.5rem;
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+
+        footer {
+            margin-top: auto;
+            background-color: var(--card);
+            border-top: 1px solid var(--border);
+            padding: 1.5rem 1rem;
+            text-align: center;
+        }
+
+        footer p {
+            color: var(--muted);
+            font-size: 0.875rem;
+        }
+        @media (hover: none) {
+            .post-card:active,
+            .btn:active,
+            nav a:active {
+                opacity: 0.7;
+            }
+        }
+
+        @supports (padding: max(0px)) {
+            .container {
+                padding-left: max(1rem, env(safe-area-inset-left));
+                padding-right: max(1rem, env(safe-area-inset-right));
+            }
+        }
+    </style>
 </head>
 <body>
     <header>
         <div class="container">
-            <h1>Kelvin's Blog</h1>
-            <nav>
-                <a href="/">Home</a>
-                <a href="#" hx-get="/create" hx-target="#content">New Post</a>
-            </nav>
+            <div class="header-content">
+                <div class="logo">Kelvin's Blog</div>
+                <div style="display: flex; align-items: center;">
+                    <nav>
+                        <a href="/">Home</a>
+                        <a href="#" hx-get="/create" hx-target="#content">New Post</a>
+                    </nav>
+                    <div class="tech-stack">
+                        <span class="tech-badge">Go</span>
+                        <span class="tech-badge">HTMX</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </header>
+
     <main id="content" class="container">
         {{template "content" .}}
     </main>
+
     <footer>
         <div class="container">
-            <p>&copy; 2024 Kelvin's Blog. All rights reserved.</p>
+            <p>Built with Go & HTMX • &copy; 2024 Kelvin's Blog</p>
         </div>
     </footer>
 </body>
